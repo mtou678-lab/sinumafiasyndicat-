@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SINU Syndicate - الإمبراطورية الشاملة للاغتيال والنجاة</title>
+    <style>
+        :root {
+            --neon-cyan: #66fcf1;
+            --neon-blue: #45f3ff;
+            --neon-red: #e43f5a;
+            --neon-orange: #f39c12;
+            --neon-green: #00b894;
+            --dark-bg: #0b0c10;
+            --panel-bg: rgba(26, 34, 46, 0.97);
+            --border-glow: 0 0 20px rgba(102, 252, 241, 0.25);
+        }
+
+        body {
+            background-image: linear-gradient(rgba(11, 12, 16, 0.95), rgba(11, 12, 16, 0.95)), url('https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=1200&q=80');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            color: #c5c6c7;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            text-align: center;
+            padding: 15px;
+            margin: 0;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 520px;
+            margin: auto;
+            background: var(--panel-bg);
+            padding: 25px;
+            border-radius: 20px;
+            box-shadow: 0 0 40px rgba(102, 252, 241, 0.3);
+            border: 1px solid var(--neon-cyan);
+            backdrop-filter: blur(10px);
+            transition: transform 0.1s ease, box-shadow 0.3s ease;
+        }
+
+        h1 {
+            color: var(--neon-cyan);
+            font-size: 36px;
+            margin: 5px 0;
+            text-shadow: 0 0 15px var(--neon-cyan);
+            font-weight: 900;
+            letter-spacing: 2px;
+        }
+
+        .subtitle {
+            color: var(--neon-blue);
+            font-size: 13px;
+            margin-bottom: 20px;
+            font-weight: bold;
+            letter-spacing: 1.5px;
+        }
+
+        /* إدارة شاشات التدفق */
+        .game-panel { display: none; }
+        #startScreen { display: block; }
+
+        /* لوحة المؤشرات الحيوية المتقدمة للنجاة */
+        .survival-hud {
+            background: rgba(0,0,0,0.75);
+            border-radius: 12px;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 1px solid rgba(102, 252, 241, 0.2);
+            box-shadow: inset 0 0 15px rgba(0,0,0,0.6);
+        }
+        .hud-bar-container {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .hud-bar-container:last-child { margin-bottom: 0; }
+        .hud-label { width: 110px; text-align: right; color: #fff; }
+        .hud-bar-bg { flex: 1; background: #111; height: 14px; border-radius: 7px; overflow: hidden; margin-right: 10px; border: 1px solid #333; position: relative; }
+        .hud-bar-fill { height: 100%; width: 100%; transition: width 0.4s cubic-bezier(0.25, 1, 0.5, 1); }
+
+        /* صندوق الإحصائيات */
+        .burn-stats {
+            background: rgba(0, 0, 0, 0.6);
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            font-size: 13px;
+            border: 1px dashed rgba(102, 252, 241, 0.4);
+        }
+        .stats-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 10px;
+        }
+        .stats-item {
+            flex: 1;
+            min-width: 130px;
+            text-align: center;
+            background: rgba(255,255,255,0.03);
+            padding: 6px;
+            border-radius: 6px;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        .burn-val {
+            color: var(--neon-red);
+            font-weight: bold;
+            text-shadow: 0 0 8px var(--neon-red);
+        }
+
+        /* شاشة العرض السينمائية الكبرى */
+        .story-screen {
+            width: 100%;
+            height: 240px;
+            border-radius: 14px;
+            border: 2px solid var(--neon-cyan);
+            margin-bottom: 20px;
+            overflow: hidden;
+            box-shadow: var(--border-glow);
+            background: #000;
+            position: relative;
+        }
+        .story-screen img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .screen-overlay-text {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(transparent, rgba(0,0,0,0.9));
+            padding: 10px;
+            font-size: 12px;
+            color: #fff;
+            text-align: right;
+            font-weight: bold;
+        }
+
+        /* الأقسام الفرعية */
+        .system-title {
+            text-align: right;
+            font-size: 14px;
+            color: var(--neon-cyan);
+            margin: 20px 5px 8px 0;
+            font-weight: bold;
+            border-bottom: 1px solid rgba(102, 252, 241, 0.2);
+            padding-bottom: 4px;
+        }
+
+        .grid-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        /* الأزرار */
+        .btn {
+            background: linear-gradient(135deg, #1f4068, #162447);
+            color: white;
+            border: 2px solid var(--neon-cyan);
+            padding: 12px 10px;
+            font-size: 14px;
+            font-weight: bold;
+            border-radius: 10px;
+            cursor: pointer;
+            width: 100%;
+            box-sizing: border-box;
+            transition: all 0.25s ease;
+        }
+        .btn:hover {
+            background: var(--neon-cyan);
+            color: var(--dark-bg);
+            box-shadow: 0 0 15px var(--neon-cyan);
+            transform: translateY(-2px);
+        }
+
+        .btn-large { padding: 15px 20px; font-size: 16px; margin-bottom: 12px; }
+        .btn-connect { background: linear-gradient(135deg, var(--neon-green), #00876c); border-color: var(--neon-green); }
+        .btn-connect:hover { background: var(--neon-green); color: white; box-shadow: 0 0 15px var(--neon-green); }
+        .btn-pvp { background: linear-gradient(135deg, #8e44ad, #4a148c); border-color: #8e44ad; }
+        .btn-pvp:hover { background: #8e44ad; color: white; box-shadow: 0 0 15px #8e44ad; }
+        .btn-pve { background: linear-gradient(135deg, #2980b9, #1f4068); border-color: #2980b9; }
+        .btn-pve:hover { background: #2980b9; color: white; box-shadow: 0 0 15px #2980b9; }
+        
+        .btn-kill { background: linear-gradient(135deg, var(--neon-red), #750517); border-color: var(--neon-red); padding: 15px; font-size: 15px; }
+        .btn-kill:hover { box-shadow: 0 0 18px var(--neon-red); background: var(--neon-red); color: white; }
+        .btn-survival { background: linear-gradient(135deg, var(--neon-orange), #d35400); border-color: var(--neon-orange); }
+        .btn-survival:hover { box-shadow: 0 0 15px var(--neon-orange); background: var(--neon-orange); color: white; }
+
+        .status-box {
+            margin-top: 20px;
+            font-size: 13px;
+            color: var(--neon-blue);
+            background: rgba(0, 0, 0, 0.8);
+            padding: 15px;
+            border-radius: 10px;
+            border-right: 4px solid var(--neon-cyan);
+            text-align: right;
+            line-height: 1.6;
+        }
+
+        .contract-list { background: rgba(0,0,0,0.4); border-radius: 8px; padding: 10px; margin-bottom: 15px; border: 1px solid rgba(255,255,255,0.05); }
+        .contract-item { display: flex; justify-content: space-between; align-items: center; font-size: 12px; }
+        .contract-badge { background: var(--neon-red); color: white; padding: 4px 8px; border-radius: 4px; font-weight: bold; }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
+</head>
+<body>
+
+    <div class="container" id="mainContainer">
+        <h1>SINU SYNDICATE</h1>
+        <div class="subtitle">الإمبراطورية المتكاملة لإدارة الاغتيالات وعقود النجاة الرقمية 🦅🎯</div>
+
+        <div id="startScreen">
+            <button class="btn btn-large btn-connect" id="walletBtn" onclick="connectWeb3Wallet()">🔗 تشفير الهوية الرقمية وربط المحفظة</button>
+            <div style="margin: 25px 0 12px 0; font-weight: bold; color: var(--neon-cyan); text-align: center; font-size: 14px;">🕵️‍♂️ اختر ملفك الأمني لدخول المنظمة:</div>
+            <button class="btn btn-large btn-pvp" onclick="enterSyndicateHub('PVP')">⚔️ ساحة تصفية الحسابات الحية (طور PvP تحدي القتلة)</button>
+            <button class="btn btn-large btn-pve" onclick="enterSyndicateHub('PVE')">🦅 إرث روبرت راث - مغامرة النجاة من الموت (طور PvE)</button>
+            <div class="status-box" style="text-align: center;">
+                🔒 <strong>بروتوكول التشفير:</strong> يتطلب دخول أنفاق المقر توقيعاً أمنياً حياً من محفظتك لمزامنة عمليات الاغتيال وحسابات نقاط النجاة الحيوية على البلوكشين.
+            </div>
+        </div>
+
+        <div id="syndicateHubScreen" class="game-panel">
+            
+            <div class="survival-hud">
+                <div class="hud-bar-container">
+                    <div class="hud-label">❤️ الصحة الحيوية:</div>
+                    <div class="hud-bar-bg"><div class="hud-bar-fill" id="healthBar" style="background: var(--neon-red); width: 100%;"></div></div>
+                </div>
+                <div class="hud-bar-container">
+                    <div class="hud-label">🛡️ درع السترة:</div>
+                    <div class="hud-bar-bg"><div class="hud-bar-fill" id="armorBar" style="background: var(--neon-blue); width: 100%;"></div></div>
+                </div>
+                <div class="hud-bar-container">
+                    <div class="hud-label">🚨 الرصد الفيدرالي:</div>
+                    <div class="hud-bar-bg"><div class="hud-bar-fill" id="heatBar" style="background: var(--neon-orange); width: 10%;"></div></div>
+                </div>
+            </div>
+
+            <div class="burn-stats">
+                <div style="color: var(--neon-cyan); font-weight: bold; text-align: center; font-size: 14px;" id="hudTitle">💀 نظام رصد نقابة القتلة</div>
+                <div class="stats-row">
+                    <div class="stats-item">ملف التشغيل: <span style="color:var(--neon-orange); font-weight:bold;" id="hudModeText">تحميل...</span></div>
+                    <div class="stats-item">رتبة الحرق الكلي 🔥: <span class="burn-val" id="totalBurned">145,230 $SINU</span></div>
+                </div>
+            </div>
+
+            <div class="story-screen">
+                <img id="gameScreen" src="https://images.unsplash.com/photo-1507034589631-9433cc6bc453?auto=format&fit=crop&w=600&q=80" alt="غرفة العمليات">
+                <div class="screen-overlay-text" id="screenOverlayLabel">كاميرا المقر: النفق السفلي الرئيسي - تمركز القاتل الأول وشريكته</div>
+            </div>
+
+            <div class="system-title">🚨 بروتوكول النجاة والمناورات الطارئة (حماية الحياة والثروة)</div>
+            <div class="grid-buttons">
+                <button class="btn btn-survival" onclick="triggerSurvivalProtocol('adrenaline')">💉 حقن أدرينالين فورية (استعادة الصحة)</button>
+                <button class="btn btn-survival" onclick="triggerSurvivalProtocol('smoke')">💨 قنبلة دخان تكتيكية (تضليل الملاحقة)</button>
+            </div>
+
+            <div class="system-title">🛠️ الترسانة وغرفة تأمين البيانات (منزل الاختباء)</div>
+            <div class="grid-buttons">
+                <button class="btn" onclick="armoryAction('silencer')">🔇 تركيب كاتم صوت بندقية القنص</button>
+                <button class="btn" onclick="armoryAction('intel')">💻 فحص الكاميرات وتشفير الاتصال</button>
+            </div>
+
+            <div class="system-title">🚊 مكاتب العقود وأوامر التصفية (تنفيذ الحرق المباشر)</div>
+            <div class="contract-list">
+                <div class="contract-item">
+                    <div>🎯 تصفية مخترق البيانات المرتد (هارب في محطة القطار)</div>
+                    <div class="contract-badge">حرق 5,000 $SINU</div>
+                </div>
+            </div>
+            <button class="btn btn-kill" onclick="executeAssassinationOrder()">🚊 إرسال طلقة القتل الفوري عبر القطار السريع</button>
+
+            <div class="system-title">💰 لوحة غسيل الأموال الرقمية وإرسال الحصص والمكافآت</div>
+            <div class="grid-buttons">
+                <button class="btn" onclick="laundryAction('mix')">🌀 خلط المعاملات وتعمية السيولة</button>
+                <button class="btn" onclick="laundryAction('payout')">💎 سحب الأرباح وتأمين حصة المافيا</button>
+            </div>
+
+            <div class="system-title">🏍️ رادار طرق ومسارات الهروب التكتيكي الدولي الخارجي</div>
+            <div class="grid-buttons">
+                <button class="btn" style="background: linear-gradient(135deg, var(--neon-orange), #b33939);" onclick="escapeAction('moto')">🏍️ طريق عام (دراجة)</button>
+                <button class="btn" style="background: linear-gradient(135deg, #2980b9, #1f4068);" onclick="escapeAction('boat')">🛥️ ميناء بحري (قارب)</button>
+                <button class="btn" style="background: linear-gradient(135deg, #2c3e50, #111); grid-column: span 2;" onclick="escapeAction('heli')">🚁 مروحية التهريب الجوي المخفية</button>
+                <button class="btn" style="grid-column: span 2; background: #111; border-color: #333;" onclick="exitToStartScreen()">↩️ تسجيل خروج من النظام والانسحاب</button>
+            </div>
+
+            <div class="status-box" id="narratorText">
+                ⚙️ <strong>المنظومة المركزية:</strong> تم تفعيل لوحة التحكم الشاملة للمافيا ونظام النجاة الحيوي. انتبه لمؤشر الرصد الفيدرالي لكي لا يتم كشف نفقك المظلم!
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        let walletAddress = null;
+        let activeSyndicateMode = "";
+        let globalBurnValue = 145230;
+        
+        // متغيرات أشرطة النجاة الكاملة
+        let health = 100; let armor = 100; let heat = 10;
+
+        function updateSurvivalHUD() {
+            document.getElementById('healthBar').style.width = health + '%';
+            document.getElementById('armorBar').style.width = armor + '%';
+            document.getElementById('heatBar').style.width = heat + '%';
+        }
+
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        function playSyndicateSound(type) {
+            let osc = audioCtx.createOscillator(); let gain = audioCtx.createGain();
+            if (type === 'click') {
+                osc.type = 'triangle'; osc.frequency.setValueAtTime(140, audioCtx.currentTime); osc.frequency.exponentialRampToValueAtTime(35, audioCtx.currentTime + 0.1);
+                gain.gain.setValueAtTime(0.2, audioCtx.currentTime); gain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.1);
+                osc.connect(gain); gain.connect(audioCtx.destination); osc.start(); osc.stop(audioCtx.currentTime + 0.1);
+            } else if (type === 'gunshot') {
+                let bufferSize = audioCtx.sampleRate * 0.4, buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate), data = buffer.getChannelData(0);
+                for (let i = 0; i < bufferSize; i++) { data[i] = Math.random() * 2 - 1; }
+                let noise = audioCtx.createBufferSource(); noise.buffer = buffer;
+                let filter = audioCtx.createBiquadFilter(); filter.type = 'lowpass'; filter.frequency.setValueAtTime(320, audioCtx.currentTime); filter.frequency.exponentialRampToValueAtTime(8, audioCtx.currentTime + 0.45);
+                gain.gain.setValueAtTime(0.65, audioCtx.currentTime); gain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.45);
+                noise.connect(filter); filter.connect(gain); gain.connect(audioCtx.destination); noise.start();
+            } else if (type === 'motorcycle') {
+                osc.type = 'sawtooth'; osc.frequency.setValueAtTime(50, audioCtx.currentTime); osc.frequency.linearRampToValueAtTime(210, audioCtx.currentTime + 0.65);
+                gain.gain.setValueAtTime(0.25, audioCtx.currentTime); gain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.65);
+                osc.connect(gain); gain.connect(audioCtx.destination); osc.start(); osc.stop(audioCtx.currentTime + 0.65);
+            } else if (type === 'mechanical') {
+                osc.type = 'triangle'; osc.frequency.setValueAtTime(300, audioCtx.currentTime); osc.frequency.linearRampToValueAtTime(150, audioCtx.currentTime + 0.15);
+                gain.gain.setValueAtTime(0.15, audioCtx.currentTime); gain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.15);
+                osc.connect(gain); gain.connect(audioCtx.destination); osc.start(); osc.stop(audioCtx.currentTime + 0.15);
+            }
+        }
+
+        const screenImg = document.getElementById('gameScreen');
+        const overlayLabel = document.getElementById('screenOverlayLabel');
+        const narratorText = document.getElementById('narratorText');
+        const burnCounter = document.getElementById('totalBurned');
+        const mainContainer = document.getElementById('mainContainer');
+
+        async function connectWeb3Wallet() {
+            playSyndicateSound('click');
+            if (window.ethereum) {
+                try {
+                    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                    walletAddress = accounts[0];
+                    document.getElementById('walletBtn').innerText = "✅ الهوية مشفرة: " + walletAddress.substring(0,6) + "...";
+                    document.getElementById('walletBtn').style.background = "#00876c";
+                } catch (e) { alert("تم رفض التصريح."); }
+            } else {
+                document.getElementById('walletBtn').innerText = "✅ متصل (محاكاة أمنية للهاتف)";
+                walletAddress = "0xSystemAdminSimulatedWalletAddress";
+            }
+        }
+
+        function enterSyndicateHub(mode) {
+            playSyndicateSound('click');
+            if (!walletAddress) { alert("يجب ربط المحفظة لتشفير هويتك الأمنية قبل دخول الخادم!"); return; }
+            
+            activeSyndicateMode = mode;
+            document.getElementById('startScreen').style.display = 'none';
+            document.getElementById('syndicateHubScreen').style.display = 'block';
+            
+            if(mode === 'PVP') {
+                document.getElementById('hudModeText').innerText = "صراع القتلة (PvP)";
+                document.getElementById('hudTitle').innerText = "⚔️ شبكة رصد وتصفية القتلة المحترفين ⚔️";
+                narratorText.innerHTML = "🕳️ <strong>المنظومة:</strong> دخلت نفق الـ PvP المظلم. رادارات التتبع ترصد قتلة مأجورين آخرين يراقبون تحركاتك... جهز استراتيجيتك حياً.";
+            } else {
+                document.getElementById('hudModeText').innerText = "المهمة الأخيرة (PvE)";
+                document.getElementById('hudTitle').innerText = "🏆 لوحة روبرت راث التاريخية للاغتيالات 🏆";
+                narratorText.innerHTML = "🎬 <strong>الراوي السينمائي:</strong> تم تفعيل ملف روبرت راث. القاتل الأول يقف في المقر السري مستعداً لإنهاء عقده الأخير وخوض مغامرة النجاة.";
+            }
+            screenImg.src = "https://images.unsplash.com/photo-1507034589631-9433cc6bc453?auto=format&fit=crop&w=600&q=80";
+            overlayLabel.innerText = "كاميرا المقر: النفق السفلي الرئيسي - تمركز القاتل الأول وشريكته";
+            updateSurvivalHUD();
+        }
+
+        // نظام النجاة والمناورة الحيوية الطارئة
+        function triggerSurvivalProtocol(action) {
+            playSyndicateSound('mechanical');
+            if (action === 'adrenaline') {
+                health = Math.min(health + 30, 100);
+                narratorText.innerHTML = "💉 <strong>بروتوكول النجاة:</strong> حقنت هرمون الأدرينالين الفوري؛ انتعشت نبضات قلبك وتجددت صحتك الحيوية بمقدار +30% لمواصلة إدارة شبكة الاغتيالات وعمليات الحرق.";
+            } else {
+                heat = Math.max(heat - 40, 10);
+                narratorText.innerHTML = "💨 <strong>تضليل راداري:</strong> فجّرت قنبلة دخان ميكانيكية كثيفة داخل أنفاق النفق المظلم! انخفض مستوى الرصد الفيدرالي بمقدار -40% واختفيت كلياً عن الأنظار.";
+            }
+            updateSurvivalHUD();
+        }
+
+        function armoryAction(actionType) {
+            playSyndicateSound('mechanical');
+            if(actionType === 'silencer') {
+                screenImg.src = "https://images.unsplash.com/photo-1595246140625-573b715d11dc?auto=format&fit=crop&w=600&q=80";
+                overlayLabel.innerText = "طاولة الترسانة: جاري تركيب وفحص كاتم الصوت عالي التردد لبندقية القنص";
+                narratorText.innerHTML = "🔇 <strong>غرفة الأسلحة:</strong> تم دمج كواتم الصوت الميكانيكية وتجهيز ذخيرة الاختراق المغناطيسية لتنفيذ الضربة القادمة بدون إحداث أي ضجيج تتبعي.";
+            } else {
+                screenImg.src = "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=600&q=80";
+                overlayLabel.innerText = "غرفة المراقبة: فحص قنوات الاتصال وتفعيل جدران حماية التشفير للشبكة";
+                narratorText.innerHTML = "💻 <strong>منظومة التأمين:</strong> شريكتك تقوم الآن بمسح الترددات، وفحص كاميرات النفق المظلم، وتشفير عنوان الـ IP الخاص بمحفظتك لمنع الرصد.";
+            }
+        }
+
+        function executeAssassinationOrder() {
+            playSyndicateSound('gunshot');
+            document.body.style.backgroundColor = "#ffffff";
+            mainContainer.style.transform = "scale(0.95) translateY(8px)";
+            setTimeout(() => { document.body.style.backgroundColor = ""; mainContainer.style.transform = "scale(1) translateY(0)"; }, 120);
+
+            screenImg.src = "https://images.unsplash.com/photo-1474487548417-781cb71495f3?auto=format&fit=crop&w=600&q=80";
+            overlayLabel.innerText = "موقع الحدث: محطة القطار السريع - لحظة اختراق رصاصة القناص للهدف";
+            
+            // عواقب الهجوم على مؤشرات النجاة
+            heat = Math.min(heat + 30, 100);
+            armor = Math.max(armor - 25, 0);
+            if (armor === 0) health = Math.max(health - 20, 10);
+
+            globalBurnValue += 5000;
+            burnCounter.innerText = globalBurnValue.toLocaleString() + " $SINU";
+
+            narratorText.innerHTML = "🚊 <strong>إطلاق نار مدوٍّ وتبادل قتال!</strong> قنص القاتل الأول الهدف بدقة فور مرور القطار وحرقنا 5,000 توكن! لكن فرقة الدعم ردت بالنار: انخفض درعك وارتفع الرصد الفيدرالي!";
+            updateSurvivalHUD();
+        }
+
+        function laundryAction(type) {
+            playSyndicateSound('mechanical');
+            if(type === 'mix') {
+                screenImg.src = "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=600&q=80";
+                overlayLabel.innerText = "شبكة الخلط: توزيع وتعمية مسارات العملات البرمجية لتأمين الغنيمة";
+                narratorText.innerHTML = "🌀 <strong>غسيل التوكنز:</strong> جاري تدوير عملات $SINU المستلمة وتوزيعها عبر محافظ خلاطة مخفية لتأمين عوائد العمليات وحقن السيولة.";
+            } else {
+                screenImg.src = "https://images.unsplash.com/photo-1559526324-4b87b5e36e44?auto=format&fit=crop&w=600&q=80";
+                overlayLabel.innerText = "خزنة المافيا: جاري توزيع حصص المكافآت وحقن السيولة الداعمة";
+                narratorText.innerHTML = "💎 <strong>توزيع الغنائم:</strong> تم بنجاح اقتطاع عوائد الاغتيال المنجز، وتحويل الأرباح الصافية إلى محفظتك مع قفل نسبة الـ 3% لدعم استقرار شبكة المافيا.";
+            }
+        }
+
+        function escapeAction(escapeType) {
+            heat = 10; // الهروب الناجح يصفر مستوى الملاحقة الفيدرالية ويؤمن اللاعب
+            if(escapeType === 'moto') {
+                playSyndicateSound('motorcycle');
+                screenImg.src = "https://images.unsplash.com/photo-1519501025264-65ba15a82390?auto=format&fit=crop&w=600&q=80";
+                overlayLabel.innerText = "مسار الهروب أ: الشوارع العامة والطرق السريعة وسط المدينة";
+                narratorText.innerHTML = "🏍️ <strong>هروب الطريق العام:</strong> انطلقت الدراجة الرياضية بسرعة خارقة متسللة وسط السيارات لتأمين موقعك وخفض مستوى الرصد الفيدرالي للحد الأدنى بأمان.";
+            } else if(escapeType === 'boat') {
+                playSyndicateSound('mechanical');
+                screenImg.src = "https://images.unsplash.com/photo-1516655855035-d5215bcb5604?auto=format&fit=crop&w=600&q=80";
+                overlayLabel.innerText = "مسار الهروب ب: الرصيف المائي والميناء البحري السري بالضواحي";
+                narratorText.innerHTML = " Bim <strong>الهروب البحري:</strong> شق القارب السريع أمواج البحر المظلمة تحت حماية الضباب الكثيف، مضللاً الرادارات الفيدرالية ومؤمناً حياة القاتل وشريكته.";
+            } else if(escapeType === 'heli') {
+                playSyndicateSound('mechanical');
+                screenImg.src = "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&w=600&q=80";
+                overlayLabel.innerText = "مسار الهروب ج: مدرج الطيران والمروحية الجوية الجاهزة على الأسطح";
+                narratorText.innerHTML = "🚁 <strong>الإخلاء الجوي الأقصى:</strong> أقلعت مروحية التهريب السوداء مخترقة السحاب لتعلن نجاح خطة النجاة واختفاء القاتل الأول تماماً عن رادارات التتبع الدولية.";
+            }
+            updateSurvivalHUD();
+        }
+
+        function exitToStartScreen() {
+            playSyndicateSound('click');
+            document.getElementById('syndicateHubScreen').style.display = 'none';
+            document.getElementById('startScreen').style.display = 'block';
+        }
+    </script>
+</body>
+</html>
