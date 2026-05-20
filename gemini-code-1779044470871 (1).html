@@ -304,6 +304,43 @@
     </div>
 
     <script>
+    // 1. التعريفات الأساسية
+    const CONTRACT_ADDRESS = "0x3E71427c4F4c3aE6DBA472Ccb17076E2148A1231";
+    const CONTRACT_ABI = [
+        "function executePveAssassination() external",
+        "function buySurvivalItem(uint256 _itemType) external"
+    ];
+
+    let walletAddress = null;
+
+    // 2. الدوال الجديدة للربط بالعقد
+    async function executeAssassinationOrder() {
+        if (!window.ethereum) return alert("يرجى استخدام متصفح MetaMask!");
+        const provider = new ethers.providers.Web3Provider(window.ethereum);
+        const signer = provider.getSigner();
+        const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
+
+        try {
+            const tx = await contract.executePveAssassination();
+            await tx.wait();
+            alert("🎯 تم تنفيذ الاغتيال بنجاح!");
+        } catch (e) {
+            alert("خطأ: " + e.message);
+        }
+    }
+
+    async function triggerSurvivalProtocol(type) {
+        const itemType = type === 'adrenaline' ? 0 : 1;
+        const provider = new ethers.providers.Web3Provider(window.ethereum);
+        const signer = provider.getSigner();
+        const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
+        try {
+            await contract.buySurvivalItem(itemType);
+            alert("✅ تم تفعيل البروتوكول!");
+        } catch (e) {
+            alert("خطأ: " + e.message);
+        }
+    }
         let walletAddress = null;
         let activeSyndicateMode = "";
         let globalBurnValue = 145230;
